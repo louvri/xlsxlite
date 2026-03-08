@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	cloud.google.com/go/storage v1.60.0
-	github.com/louvri/xlsxlite v0.0.0
+	github.com/louvri/xlsxlite v0.1.0
 )
 
 require (
@@ -55,5 +55,3 @@ require (
 	google.golang.org/grpc v1.78.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
-
-replace github.com/louvri/xlsxlite => ../
