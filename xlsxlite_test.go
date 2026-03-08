@@ -765,7 +765,7 @@ func TestAllCellTypesRoundTrip(t *testing.T) {
 		dateStyle := ss.AddStyle(Style{NumberFormat: "yyyy-mm-dd"})
 
 		sw, _ := w.NewSheet(SheetConfig{Name: "Types"})
-		sw.WriteRow(Row{Cells: []Cell{
+		_ = sw.WriteRow(Row{Cells: []Cell{
 			StringCell("text"),
 			NumberCell(3.14),
 			IntCell(42),
@@ -776,7 +776,7 @@ func TestAllCellTypesRoundTrip(t *testing.T) {
 			{Value: float32(1.5), Type: CellTypeNumber},
 			{Value: int64(999), Type: CellTypeNumber},
 		}})
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Types")
@@ -829,13 +829,13 @@ func TestAllCellTypesRoundTrip(t *testing.T) {
 func TestEmptyCellsRoundTrip(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Sparse"})
-		sw.WriteRow(Row{Cells: []Cell{
+		_ = sw.WriteRow(Row{Cells: []Cell{
 			StringCell("A"),
 			EmptyCell(),
 			EmptyCell(),
 			StringCell("D"),
 		}})
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Sparse")
@@ -856,10 +856,10 @@ func TestEmptyCellWithStyle(t *testing.T) {
 		ss := w.StyleSheet()
 		style := ss.AddStyle(Style{Font: &Font{Bold: true}})
 		sw, _ := w.NewSheet(SheetConfig{Name: "S"})
-		sw.WriteRow(Row{Cells: []Cell{
+		_ = sw.WriteRow(Row{Cells: []Cell{
 			{Type: CellTypeEmpty, Value: nil, StyleID: style},
 		}})
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "S")
@@ -882,11 +882,11 @@ func TestStyleRoundTrip(t *testing.T) {
 		})
 
 		sw, _ := w.NewSheet(SheetConfig{Name: "Styled"})
-		sw.WriteRow(Row{Cells: []Cell{
+		_ = sw.WriteRow(Row{Cells: []Cell{
 			StyledCell("Header", boldStyle),
 			StyledCell(42.0, boldStyle),
 		}})
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Styled")
@@ -905,12 +905,12 @@ func TestMultipleStyles(t *testing.T) {
 		s2 := ss.AddStyle(Style{Font: &Font{Italic: true}})
 
 		sw, _ := w.NewSheet(SheetConfig{Name: "S"})
-		sw.WriteRow(Row{Cells: []Cell{
+		_ = sw.WriteRow(Row{Cells: []Cell{
 			StyledCell("bold", s1),
 			StyledCell("italic", s2),
 			StringCell("plain"),
 		}})
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "S")
@@ -930,8 +930,8 @@ func TestMergeCells(t *testing.T) {
 				{StartCol: 0, StartRow: 1, EndCol: 2, EndRow: 1},
 			},
 		})
-		sw.WriteRow(MakeRow("Merged Title", nil, nil))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("Merged Title", nil, nil))
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Merged")
@@ -949,9 +949,9 @@ func TestMultipleMergeCells(t *testing.T) {
 				{StartCol: 0, StartRow: 2, EndCol: 3, EndRow: 2},
 			},
 		})
-		sw.WriteRow(MakeRow("M1"))
-		sw.WriteRow(MakeRow("M2"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("M1"))
+		_ = sw.WriteRow(MakeRow("M2"))
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Multi")
@@ -964,8 +964,8 @@ func TestMultipleSheets(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		for _, name := range []string{"Sheet1", "Sheet2", "Sheet3"} {
 			sw, _ := w.NewSheet(SheetConfig{Name: name})
-			sw.WriteRow(MakeRow("Data from " + name))
-			sw.Close()
+			_ = sw.WriteRow(MakeRow("Data from " + name))
+			_ = sw.Close()
 		}
 	})
 
@@ -998,9 +998,9 @@ func TestMultipleSheets(t *testing.T) {
 func TestRowHeight(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "H"})
-		sw.WriteRow(Row{Cells: []Cell{StringCell("Tall")}, Height: 40})
-		sw.WriteRow(Row{Cells: []Cell{StringCell("Default")}})
-		sw.Close()
+		_ = sw.WriteRow(Row{Cells: []Cell{StringCell("Tall")}, Height: 40})
+		_ = sw.WriteRow(Row{Cells: []Cell{StringCell("Default")}})
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "H")
@@ -1015,11 +1015,11 @@ func TestRowHeight(t *testing.T) {
 func TestRowIndex(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "RI"})
-		sw.WriteRow(MakeRow("row1"))                               // auto row 1
-		sw.WriteRow(MakeRow("row2"))                               // auto row 2
-		sw.WriteRow(Row{Cells: []Cell{StringCell("row5")}, RowIndex: 5}) // explicit row 5
-		sw.WriteRow(MakeRow("row6"))                               // auto row 6
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("row1"))                               // auto row 1
+		_ = sw.WriteRow(MakeRow("row2"))                               // auto row 2
+		_ = sw.WriteRow(Row{Cells: []Cell{StringCell("row5")}, RowIndex: 5}) // explicit row 5
+		_ = sw.WriteRow(MakeRow("row6"))                               // auto row 6
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "RI")
@@ -1052,9 +1052,9 @@ func TestDateCellRoundTrip(t *testing.T) {
 		dateStyle := ss.AddStyle(Style{NumberFormat: "yyyy-mm-dd"})
 		sw, _ := w.NewSheet(SheetConfig{Name: "Dates"})
 		for _, d := range dates {
-			sw.WriteRow(Row{Cells: []Cell{DateCell(d, dateStyle)}})
+			_ = sw.WriteRow(Row{Cells: []Cell{DateCell(d, dateStyle)}})
 		}
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Dates")
@@ -1077,10 +1077,10 @@ func TestDateCellRoundTrip(t *testing.T) {
 func TestFreezeRowOnly(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "F", FreezeRow: 2})
-		sw.WriteRow(MakeRow("header1"))
-		sw.WriteRow(MakeRow("header2"))
-		sw.WriteRow(MakeRow("data"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("header1"))
+		_ = sw.WriteRow(MakeRow("header2"))
+		_ = sw.WriteRow(MakeRow("data"))
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "F")
@@ -1092,8 +1092,8 @@ func TestFreezeRowOnly(t *testing.T) {
 func TestFreezeColOnly(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "FC", FreezeCol: 1})
-		sw.WriteRow(MakeRow("frozen", "scrollable"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("frozen", "scrollable"))
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "FC")
@@ -1105,8 +1105,8 @@ func TestFreezeColOnly(t *testing.T) {
 func TestFreezeRowAndCol(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "FRC", FreezeRow: 1, FreezeCol: 2})
-		sw.WriteRow(MakeRow("a", "b", "c"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("a", "b", "c"))
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "FRC")
@@ -1118,8 +1118,8 @@ func TestFreezeRowAndCol(t *testing.T) {
 func TestSpecialCharactersInCells(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Special"})
-		sw.WriteRow(MakeRow("a&b", "<tag>", "c>d", `say "hi"`, "normal"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("a&b", "<tag>", "c>d", `say "hi"`, "normal"))
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Special")
@@ -1134,8 +1134,8 @@ func TestSpecialCharactersInCells(t *testing.T) {
 func TestSpecialCharactersInSheetName(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Sales & Revenue"})
-		sw.WriteRow(MakeRow("data"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("data"))
+		_ = sw.Close()
 	})
 
 	names := reader.SheetNames()
@@ -1147,8 +1147,8 @@ func TestSpecialCharactersInSheetName(t *testing.T) {
 func TestEmptyStringCell(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "S"})
-		sw.WriteRow(MakeRow("", "notempty"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("", "notempty"))
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "S")
@@ -1163,7 +1163,7 @@ func TestEmptyStringCell(t *testing.T) {
 func TestLargeNumbers(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "N"})
-		sw.WriteRow(Row{Cells: []Cell{
+		_ = sw.WriteRow(Row{Cells: []Cell{
 			NumberCell(0),
 			NumberCell(-1.5),
 			NumberCell(math.MaxFloat64),
@@ -1171,7 +1171,7 @@ func TestLargeNumbers(t *testing.T) {
 			IntCell(math.MaxInt32),
 			{Value: int64(math.MaxInt64), Type: CellTypeNumber},
 		}})
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "N")
@@ -1196,8 +1196,8 @@ func TestManyColumns(t *testing.T) {
 		for i := range cells {
 			cells[i] = IntCell(i)
 		}
-		sw.WriteRow(Row{Cells: cells})
-		sw.Close()
+		_ = sw.WriteRow(Row{Cells: cells})
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Wide")
@@ -1214,7 +1214,7 @@ func TestManyColumns(t *testing.T) {
 func TestEmptySheet(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Empty"})
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Empty")
@@ -1226,8 +1226,8 @@ func TestEmptySheet(t *testing.T) {
 func TestSheetWithNoName(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{})
-		sw.WriteRow(MakeRow("data"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("data"))
+		_ = sw.Close()
 	})
 
 	names := reader.SheetNames()
@@ -1245,9 +1245,9 @@ func TestManyRowsSmall(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Many"})
 		for i := 0; i < n; i++ {
-			sw.WriteRow(MakeRow(fmt.Sprintf("r%d", i), i))
+			_ = sw.WriteRow(MakeRow(fmt.Sprintf("r%d", i), i))
 		}
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Many")
@@ -1284,8 +1284,8 @@ func TestOpenFileNotFound(t *testing.T) {
 func TestOpenSheetNotFound(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Real"})
-		sw.WriteRow(MakeRow("data"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("data"))
+		_ = sw.Close()
 	})
 
 	_, err := reader.OpenSheet("NonExistent")
@@ -1297,7 +1297,7 @@ func TestOpenSheetNotFound(t *testing.T) {
 func TestOpenSheetByIndexOutOfRange(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "S"})
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	_, err := reader.OpenSheetByIndex(-1)
@@ -1314,7 +1314,7 @@ func TestReaderClose(t *testing.T) {
 	// Reader from OpenReader (no closer)
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "S"})
-		sw.Close()
+		_ = sw.Close()
 	})
 	if err := reader.Close(); err != nil {
 		t.Errorf("Close on OpenReader-created reader: %v", err)
@@ -1330,9 +1330,9 @@ func TestReaderCloseWithFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	sw, _ := w.NewSheet(SheetConfig{Name: "S"})
-	sw.WriteRow(MakeRow("data"))
-	sw.Close()
-	w.Close()
+	_ = sw.WriteRow(MakeRow("data"))
+	_ = sw.Close()
+	_ = w.Close()
 	f.Close()
 
 	reader, err := OpenFile(path)
@@ -1352,9 +1352,9 @@ func TestReaderCloseWithFile(t *testing.T) {
 func TestIteratorNextAfterClose(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "S"})
-		sw.WriteRow(MakeRow("a"))
-		sw.WriteRow(MakeRow("b"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("a"))
+		_ = sw.WriteRow(MakeRow("b"))
+		_ = sw.Close()
 	})
 
 	iter, _ := reader.OpenSheet("S")
@@ -1369,8 +1369,8 @@ func TestIteratorNextAfterClose(t *testing.T) {
 func TestIteratorErrNilOnSuccess(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "S"})
-		sw.WriteRow(MakeRow("data"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("data"))
+		_ = sw.Close()
 	})
 
 	iter, _ := reader.OpenSheet("S")
@@ -1406,15 +1406,15 @@ func TestCreateFileAndOpenFile(t *testing.T) {
 		ColWidths: map[int]float64{0: 25, 1: 15},
 		FreezeRow: 1,
 	})
-	sw.WriteRow(Row{Cells: []Cell{
+	_ = sw.WriteRow(Row{Cells: []Cell{
 		StyledCell("Name", headerStyle),
 		StyledCell("Score", headerStyle),
 	}})
 	for i := 0; i < 50; i++ {
-		sw.WriteRow(MakeRow(fmt.Sprintf("Student %d", i+1), float64(50+i)))
+		_ = sw.WriteRow(MakeRow(fmt.Sprintf("Student %d", i+1), float64(50+i)))
 	}
-	sw.Close()
-	w.Close()
+	_ = sw.Close()
+	_ = w.Close()
 	f.Close()
 
 	reader, err := OpenFile(path)
@@ -1513,10 +1513,10 @@ func TestLargeFile(t *testing.T) {
 
 	rows := 100_000
 	for i := 0; i < rows; i++ {
-		sw.WriteRow(MakeRow(fmt.Sprintf("Row %d", i), float64(i), i%2 == 0))
+		_ = sw.WriteRow(MakeRow(fmt.Sprintf("Row %d", i), float64(i), i%2 == 0))
 	}
-	sw.Close()
-	w.Close()
+	_ = sw.Close()
+	_ = w.Close()
 
 	data := buf.Bytes()
 	t.Logf("100k rows: file size = %d bytes (%.1f MB)", len(data), float64(len(data))/1024/1024)
@@ -1541,7 +1541,7 @@ func TestLargeFile(t *testing.T) {
 func TestUnicodeStrings(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Unicode"})
-		sw.WriteRow(MakeRow(
+		_ = sw.WriteRow(MakeRow(
 			"日本語",
 			"Ñoño",
 			"Ü∞≠",
@@ -1549,7 +1549,7 @@ func TestUnicodeStrings(t *testing.T) {
 			"中文测试",
 			"العربية",
 		))
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Unicode")
@@ -1565,8 +1565,8 @@ func TestLongString(t *testing.T) {
 	long := strings.Repeat("abcdefghij", 1000) // 10,000 chars
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Long"})
-		sw.WriteRow(MakeRow(long))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow(long))
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Long")
@@ -1580,9 +1580,9 @@ func TestSharedStringDedup(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Dedup"})
 		for i := 0; i < 100; i++ {
-			sw.WriteRow(MakeRow("repeated", "value", "abc"))
+			_ = sw.WriteRow(MakeRow("repeated", "value", "abc"))
 		}
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Dedup")
@@ -1602,10 +1602,10 @@ func TestDefaultFallbackCellType(t *testing.T) {
 	type myStruct struct{ X int }
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Fallback"})
-		sw.WriteRow(Row{Cells: []Cell{
+		_ = sw.WriteRow(Row{Cells: []Cell{
 			{Value: myStruct{X: 7}, Type: CellTypeString},
 		}})
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Fallback")
@@ -1621,10 +1621,10 @@ func TestTimeCellRoundTrip(t *testing.T) {
 		ss := w.StyleSheet()
 		dateStyle := ss.AddStyle(Style{NumberFormat: "yyyy-mm-dd hh:mm:ss"})
 		sw, _ := w.NewSheet(SheetConfig{Name: "Time"})
-		sw.WriteRow(Row{Cells: []Cell{
+		_ = sw.WriteRow(Row{Cells: []Cell{
 			{Value: ts, Type: CellTypeDate, StyleID: dateStyle},
 		}})
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Time")
@@ -1649,8 +1649,8 @@ func TestColumnWidthsOrder(t *testing.T) {
 					4: 40, 2: 20, 0: 10, 3: 30, 1: 15,
 				},
 			})
-			sw.WriteRow(MakeRow("a", "b", "c", "d", "e"))
-			sw.Close()
+			_ = sw.WriteRow(MakeRow("a", "b", "c", "d", "e"))
+			_ = sw.Close()
 		})
 
 		rows := readAllRows(t, reader, "CW")
@@ -1663,8 +1663,8 @@ func TestColumnWidthsOrder(t *testing.T) {
 func TestSingleCellRow(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Single"})
-		sw.WriteRow(MakeRow("only one"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("only one"))
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Single")
@@ -1678,12 +1678,12 @@ func TestNilValueCellWithStyle(t *testing.T) {
 		ss := w.StyleSheet()
 		style := ss.AddStyle(Style{Font: &Font{Bold: true}})
 		sw, _ := w.NewSheet(SheetConfig{Name: "S"})
-		sw.WriteRow(Row{Cells: []Cell{
+		_ = sw.WriteRow(Row{Cells: []Cell{
 			StringCell("before"),
 			{Value: nil, Type: CellTypeEmpty, StyleID: style},
 			StringCell("after"),
 		}})
-		sw.Close()
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "S")
@@ -1757,8 +1757,8 @@ func TestXMLInjectionInSheetName(t *testing.T) {
 	// Sheet names with XML metacharacters should be escaped in workbook.xml
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: `Sheet"<>&'Test`})
-		sw.WriteRow(MakeRow("data"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("data"))
+		_ = sw.Close()
 	})
 
 	names := reader.SheetNames()
@@ -1776,8 +1776,8 @@ func TestXMLInjectionInCellValues(t *testing.T) {
 	malicious := `<script>alert("xss")</script>&<b>`
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "XSS"})
-		sw.WriteRow(MakeRow(malicious))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow(malicious))
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "XSS")
@@ -1801,8 +1801,8 @@ func TestPathTraversalInRelationships(t *testing.T) {
 	// We test indirectly by verifying the library doesn't panic on normal paths.
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Safe"})
-		sw.WriteRow(MakeRow("data"))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("data"))
+		_ = sw.Close()
 	})
 
 	rows := readAllRows(t, reader, "Safe")
