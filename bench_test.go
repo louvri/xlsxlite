@@ -44,15 +44,15 @@ func BenchmarkRead100kRows(b *testing.B) {
 	w := NewWriter(&buf)
 	sw, _ := w.NewSheet(SheetConfig{Name: "Bench"})
 	for i := 0; i < 100_000; i++ {
-		sw.WriteRow(MakeRow(
+		_ = sw.WriteRow(MakeRow(
 			fmt.Sprintf("Row %d", i),
 			float64(i),
 			i%2 == 0,
 			"constant string value",
 		))
 	}
-	sw.Close()
-	w.Close()
+	_ = sw.Close()
+	_ = w.Close()
 	data := buf.Bytes()
 
 	b.ResetTimer()
@@ -93,14 +93,14 @@ func BenchmarkWrite1MRows(b *testing.B) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "Bench"})
 
 		for i := 0; i < 1_000_000; i++ {
-			sw.WriteRow(MakeRow(
+			_ = sw.WriteRow(MakeRow(
 				fmt.Sprintf("Row %d", i),
 				float64(i),
 				i%2 == 0,
 			))
 		}
 
-		sw.Close()
-		w.Close()
+		_ = sw.Close()
+		_ = w.Close()
 	}
 }

@@ -16,10 +16,7 @@
 //   - No formula engine, no charts, no images (keeps it lean)
 package xlsxlite
 
-import (
-	"encoding/xml"
-	"time"
-)
+import "time"
 
 // ──────────────────────────────────────────────
 // Cell value types
@@ -168,28 +165,6 @@ const (
 	relTypeStyles        = nsOfficeDocRels + "/styles"
 	relTypeSharedStrings = nsOfficeDocRels + "/sharedStrings"
 )
-
-// ──────────────────────────────────────────────
-// Internal XML structs (minimal, for streaming)
-// ──────────────────────────────────────────────
-
-// xmlWorkbook is the minimal workbook.xml structure.
-type xmlWorkbook struct {
-	XMLName xml.Name       `xml:"workbook"`
-	Xmlns   string         `xml:"xmlns,attr"`
-	XmlnsR  string         `xml:"xmlns:r,attr"`
-	Sheets  xmlWorkbookSheets `xml:"sheets"`
-}
-
-type xmlWorkbookSheets struct {
-	Sheets []xmlSheet `xml:"sheet"`
-}
-
-type xmlSheet struct {
-	Name    string `xml:"name,attr"`
-	SheetID int    `xml:"sheetId,attr"`
-	RID     string `xml:"http://schemas.openxmlformats.org/officeDocument/2006/relationships id,attr"`
-}
 
 // ──────────────────────────────────────────────
 // Helper: Excel date epoch

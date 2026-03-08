@@ -711,11 +711,11 @@ func readAllRows(t *testing.T, r *Reader, name string) []*Row {
 func TestBasicWriteAndRead(t *testing.T) {
 	reader := writeAndRead(t, func(w *Writer) {
 		sw, _ := w.NewSheet(SheetConfig{Name: "TestSheet", ColWidths: map[int]float64{0: 20, 1: 15, 2: 30}})
-		sw.WriteRow(MakeRow("Name", "Age", "Active"))
-		sw.WriteRow(MakeRow("Alice", 30, true))
-		sw.WriteRow(MakeRow("Bob", 25, false))
-		sw.WriteRow(MakeRow("Charlie", 35.5, true))
-		sw.Close()
+		_ = sw.WriteRow(MakeRow("Name", "Age", "Active"))
+		_ = sw.WriteRow(MakeRow("Alice", 30, true))
+		_ = sw.WriteRow(MakeRow("Bob", 25, false))
+		_ = sw.WriteRow(MakeRow("Charlie", 35.5, true))
+		_ = sw.Close()
 	})
 
 	sheets := reader.SheetNames()
@@ -1734,7 +1734,9 @@ func TestXMLInjectionInStyleFields(t *testing.T) {
 
 	// Write the styles XML
 	var stylesBuf bytes.Buffer
-	ss.writeXML(&stylesBuf)
+	if err := ss.writeXML(&stylesBuf); err != nil {
+		t.Fatalf("writeXML: %v", err)
+	}
 	xml := stylesBuf.String()
 
 	// The malicious string should NEVER appear unescaped
