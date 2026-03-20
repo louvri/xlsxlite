@@ -81,6 +81,13 @@ func (r *Reader) Close() error {
 	return nil
 }
 
+// SetCloser sets the closer that will be called when Reader.Close is invoked.
+// This is used by helpers (e.g. gcs.OpenFileLowMem) to attach cleanup logic
+// such as deleting temporary files.
+func (r *Reader) SetCloser(c io.Closer) {
+	r.closer = c
+}
+
 // SheetNames returns the names of all sheets in workbook order.
 func (r *Reader) SheetNames() []string {
 	names := make([]string, len(r.sheets))
