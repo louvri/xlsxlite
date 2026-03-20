@@ -1,7 +1,7 @@
 // Package gcs provides Google Cloud Storage helpers for xlsxlite.
 //
-// Reading downloads the object into memory (required because zip.Reader
-// needs io.ReaderAt, which GCS objects don't implement).
+// Reading: OpenFile downloads entirely into memory; OpenFileLowMem
+// spills to a temp file to keep heap usage low for large files.
 //
 // Writing streams directly to a GCS object writer.
 package gcs
@@ -11,6 +11,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 
 	"cloud.google.com/go/storage"
 	"github.com/louvri/xlsxlite"
@@ -33,6 +34,65 @@ func OpenFile(ctx context.Context, client *storage.Client, bucket, object string
 	}
 
 	return xlsxlite.OpenReader(bytes.NewReader(data), int64(len(data)))
+}
+
+// OpenFileLowMem opens an XLSX file from GCS using a temporary file on disk
+// instead of holding the entire file in memory. This is ideal for large files
+// (e.g. 500k+ rows) where the file content would otherwise stay in heap.
+//
+// The returned Reader uses an os.File-backed io.ReaderAt, so zip decompression
+// reads from disk. The temp file is automatically deleted when Reader.Close is called.
+func OpenFileLowMem(ctx context.Context, client *storage.Client, bucket, object string) (*xlsxlite.Reader, error) {
+	rc, err := client.Bucket(bucket).Object(object).NewReader(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("gcs open %s/%s: %w", bucket, object, err)
+	}
+	defer rc.Close()
+
+	tmp, err := os.CreateTemp("", "xlsxlite-*.xlsx")
+	if err != nil {
+		return nil, fmt.Errorf("create temp file: %w", err)
+	}
+
+	// On any error below, clean up the temp file.
+	cleanup := func() {
+		tmp.Close()
+		os.Remove(tmp.Name())
+	}
+
+	written, err := io.Copy(tmp, io.LimitReader(rc, xlsxlite.MaxGCSDownloadSize))
+	if err != nil {
+		cleanup()
+		return nil, fmt.Errorf("gcs download %s/%s: %w", bucket, object, err)
+	}
+
+	if _, err := tmp.Seek(0, io.SeekStart); err != nil {
+		cleanup()
+		return nil, fmt.Errorf("seek temp file: %w", err)
+	}
+
+	reader, err := xlsxlite.OpenReader(tmp, written)
+	if err != nil {
+		cleanup()
+		return nil, err
+	}
+
+	// Attach cleanup so Reader.Close() removes the temp file.
+	tmpName := tmp.Name()
+	reader.SetCloser(fileCloser{file: tmp, path: tmpName})
+
+	return reader, nil
+}
+
+// fileCloser closes the file handle and removes the file from disk.
+type fileCloser struct {
+	file *os.File
+	path string
+}
+
+func (fc fileCloser) Close() error {
+	fc.file.Close()
+	return os.Remove(fc.path)
 }
 
 // CreateFile creates a new XLSX file on GCS for streaming writing.

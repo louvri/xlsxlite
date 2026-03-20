@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	cloud.google.com/go/storage v1.60.0
-	github.com/louvri/xlsxlite v0.1.0
+	github.com/louvri/xlsxlite v0.1.3
 )
 
 require (
